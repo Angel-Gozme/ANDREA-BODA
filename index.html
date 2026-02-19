@@ -405,7 +405,7 @@
         }
 
         .date-box {
-            margin-bottom: 50px;
+            margin-bottom: 20px;
         }
 
         .date-number {
@@ -598,7 +598,7 @@
 
         .blessing-text {
             font-family: var(--font-serif);
-            font-size: clamp(1.1rem, 3vw, 1.4rem);
+            font-size: clamp(1.8rem, 3vw, 1.8rem);
             color: rgba(255,255,255,0.9);
             text-align: center;
             font-style: italic;
@@ -660,7 +660,7 @@
 
         .godparents-text {
             font-family: var(--font-serif);
-            font-size: 1.1rem;
+            font-size: 1.5rem;
             color: rgba(255,255,255,0.75);
             text-align: center;
             font-style: italic;
@@ -1139,7 +1139,7 @@
                         <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                     </div>
                     <h4 class="parent-label">Padres del Novio</h4>
-                    <p class="parent-names">Raymundo Zevallos Cárdenas (+)<br>Adelina Alarcón Chirinos</p>
+                    <p class="parent-names">Raymundo Zevallos Cárdenas (🕊️)<br>Adelina Alarcón Chirinos</p>
                 </div>
 
                 <!-- Padres de la Novia -->
@@ -1249,8 +1249,8 @@
         <!-- FOOTER -->
         <footer class="footer">
             <h2 class="footer-names">ANDREA & HENRY</h2>
-            <p class="footer-date">15 de Junio de 2026 | Con amor, siempre</p>
-            <a href="https://wa.me/1234567890?text=Confirmo%20mi%20asistencia" class="btn-confirm" target="_blank">Confirma tu asistencia</a>
+            <p class="footer-date">25 de Abril de 2026 | Con amor, siempre</p>
+            <a href="https://wa.me/+51971906155?text=Confirmo%20mi%20asistencia" class="btn-confirm" target="_blank">Confirma tu asistencia</a>
         </footer>
     </main>
 
@@ -1263,7 +1263,7 @@
 
     <!-- AUDIO -->
     <audio id="weddingMusic" loop>
-        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+        <source src="https://mcdn.podbean.com/mf/web/f7jbrmfd4q4dwz99/cancion_a8t9bv.mp3" type="audio/mpeg">
     </audio>
 
     <script>
@@ -1293,7 +1293,7 @@
 
         // Contador regresivo
         function initCountdown() {
-            const weddingDate = new Date('2026-04-15T16:00:00').getTime();
+            const weddingDate = new Date('2026-04-25T12:30:00').getTime();
 
             function updateCountdown() {
                 const now = new Date().getTime();
@@ -1340,11 +1340,11 @@
                 : 'Boda de Andrea y Henry - Recepción';
 
             const location = eventType === 'ceremony'
-                ? 'Iglesia de San Miguel Arcángel, Calle Principal 123, Ciudad'
-                : 'Jardines del Lago, Avenida de los Pinos 456, Ciudad';
+                ? 'Iglesia San Antonio de Abad San Antonio 346, Miraflores, Perú'
+                : 'La casa del abuelo, Characato, Perú';
 
-            const startTime = eventType === 'ceremony' ? '20260415T160000' : '20260415T180000';
-            const endTime = eventType === 'ceremony' ? '20260415T173000' : '20260415T235900';
+            const startTime = eventType === 'ceremony' ? '20260425T123000' : '20260425T160000';
+            const endTime = eventType === 'ceremony' ? '20260425T143000' : '20260425T235900';
 
             const googleCalendarUrl = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(title) + '&dates=' + startTime + '/' + endTime + '&location=' + encodeURIComponent(location) + '&details=' + encodeURIComponent('Nos complace invitarte a celebrar nuestro amor');
 
@@ -1396,4 +1396,5 @@
     </script>
 </body>
 </html>
+
 
