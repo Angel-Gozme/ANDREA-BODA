@@ -4,7 +4,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
 <style>
-/* Mismo universo pastel de la web original: puertas en arco, cielo suave, piscina de luz.
+/* Mismo universo pastel de la web original: puertas en arco, cielo suave, piscina de luz. 
    Añadido: puertas que recuerdan tu visita, portal con zoom y destellos, pasos interactivos por plataforma. */
 :root{
   color-scheme:light;
