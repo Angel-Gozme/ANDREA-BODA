@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Guardianas: Las Cuatro Semillas</title>
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);--bg:#0b140e;--pn:rgba(14,24,18,.78);--tx:#f6f8ef;--ac:#ffd36b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#08110b}}
+:root[data-theme="dark"]{--bg:#08110b}
+html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:Georgia,serif;overflow:hidden}
+#w{position:relative;width:100%;height:100%}canvas{display:block;width:100%;height:100%}
+.ov{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:20px;gap:12px}.on{display:flex}
+.p{background:var(--pn);border-radius:12px;padding:8px 12px;backdrop-filter:blur(5px)}
+h1{margin:0;font-size:clamp(30px,7vw,60px);color:var(--ac);text-shadow:0 0 30px #ffb347,0 3px 0 #5a3a10;letter-spacing:2px}h2{margin:0;color:var(--ac)}
+.sm{font:14px system-ui,sans-serif;opacity:.88;max-width:560px;line-height:1.5;margin:0}
+.b{background:var(--ac);color:#2a2410;font:700 17px system-ui,sans-serif;border:0;border-radius:30px;padding:12px 28px;cursor:pointer;box-shadow:0 4px 0 #a07a20}
+#title{background:radial-gradient(transparent 40%,rgba(0,0,0,.55))}
+#bars{display:none}#bars.on{display:block}#bars div{position:absolute;left:0;right:0;height:11%;background:#000}#bars div:last-child{bottom:0}
+#sub{position:absolute;left:50%;bottom:13%;transform:translateX(-50%);width:min(760px,90%);text-align:center;font-size:clamp(17px,2.6vw,26px);line-height:1.45;text-shadow:0 2px 6px #000;display:none}#sub.on{display:block}
+#hud{position:absolute;inset:0;pointer-events:none;display:none;font:14px system-ui,sans-serif}#hud.on{display:block}
+#obj{position:absolute;top:12px;left:12px;max-width:min(340px,70%)}#obj b{color:var(--ac)}
+#ctl{position:absolute;top:12px;right:12px;font-size:12px;opacity:.85;text-align:right;line-height:1.6}
+#gs{position:absolute;left:12px;bottom:12px;display:flex;gap:8px;pointer-events:auto}
+.g{width:62px;text-align:center;padding:6px 4px;border:2px solid transparent;cursor:pointer;font-size:11px}.g.on{border-color:var(--ac)}.g i{display:block;width:30px;height:30px;border-radius:50%;margin:0 auto 4px}.g.l{opacity:.4}
+#pr{position:absolute;left:50%;bottom:92px;transform:translateX(-50%);text-align:center;display:none;color:var(--ac);font-weight:700}
+#msg{position:absolute;left:50%;top:22%;transform:translateX(-50%);max-width:min(560px,90%);text-align:center;opacity:0;transition:opacity .3s}
+#dlg{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);width:min(680px,92%);display:none;pointer-events:auto;font-size:16px;line-height:1.5}#dlg b{color:var(--ac)}#dlg small{display:block;text-align:right;opacity:.7;margin-top:4px}
+#fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity .4s}
+</style>
+</head>
+<body>
+<div id="w">
+<div id="bars"><div></div><div></div></div><div id="sub"></div>
+<div class="ov on" id="title">
+  <p class="sm" style="letter-spacing:4px">UNA AVENTURA DE PUZLES</p>
+  <h1>GUARDIANAS</h1><h2>Las Cuatro Semillas</h2>
+  <p class="sm">La Mancha rompió el Corazón del Árbol de la Vida. Solo cuatro guardianas pueden sanarlo, y ninguna puede hacerlo sola.</p>
+  <button class="b" id="play">▶ Jugar</button><p class="sm">Capítulo 1: Bosque Susurrante</p>
+</div>
+<div id="hud">
+  <div id="obj" class="p"></div>
+  <div id="ctl" class="p">WASD mover · mouse cámara (clic en el juego)<br>← → girar cámara · Espacio habilidad<br>Shift transformar · Tab cambiar guardiana · E hablar/tomar</div>
+  <div id="gs"></div><div id="pr" class="p"></div><div id="msg" class="p"></div>
+  <div id="dlg" class="p"></div>
+</div>
+<div class="ov" id="end" style="background:rgba(8,16,10,.82)">
+  <h1 style="font-size:clamp(26px,5vw,46px)">¡Primera Semilla de Luz recuperada!</h1>
+  <p class="sm">Zorro cavó, plantó y siguió el rastro. Tortuga purificó el río. Juntas abrieron el camino: eso es ser guardianas.<br><br>Próximo capítulo: <b>Laguna de Cristal</b>, con la Tortuga y el poder del agua.</p>
+  <button class="b" onclick="location.reload()">Volver a jugar</button>
+</div>
+<div id="fade"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+var T=THREE,$=function(i){return document.getElementById(i)},K=function(v,a,b){return Math.max(a,Math.min(b,v))};
+var G=[{n:"Zorro",an:"Zorro protector",c:0xff8a3d,o:[0x2e9e4a,0xffd36b]},{n:"Tortuga",an:"Tortuga sanadora",c:0x4fae6a,o:[0x1b8aa6,0xbff3ff]},{n:"Colibrí",c:0x2cc9c0,lock:1},{n:"Mariposa",c:0xb07cf0,lock:1}];
+// ---------- escena ----------
+var cv=document.createElement("canvas");$("w").insertBefore(cv,$("bars"));
+var ren=new T.WebGLRenderer({canvas:cv,antialias:true});ren.setPixelRatio(Math.min(devicePixelRatio,2));
+var sc=new T.Scene(),SK0=new T.Color(0x6f777b),SK1=new T.Color(0x8fd8ff);sc.background=new T.Color();sc.fog=new T.Fog(0,24,90);
+var cam=new T.PerspectiveCamera(62,1,.1,250);
+sc.add(new T.HemisphereLight(0xffffff,0x4d5f4d,.95));var sun=new T.DirectionalLight(0xfff0c8,.9);sun.position.set(-20,50,30);sc.add(sun);
+function M(g,c,x,y,z,em){var m=new T.Mesh(g,new T.MeshLambertMaterial({color:c,emissive:em||0}));m.position.set(x||0,y||0,z||0);return m}
+function SP(r){return new T.SphereGeometry(r,14,10)}function CO(r,h){return new T.ConeGeometry(r,h,8)}function CY(a,b,h){return new T.CylinderGeometry(a,b,h,10)}
+var OB=[{a:-30,b:-28,k:"wall",open:0},{a:-48,b:-40,k:"gap",open:0},{a:-66,b:-58,k:"river",open:0}];
+function box(x,a,b){return K(Math.min(x-a,b-x)/1.6,0,1)}
+function hb(x,z){return(Math.sin(x*.3)*Math.cos(z*.27)*1.1+Math.sin(x*.11+z*.13)*1.5)*K((Math.abs(z)-6)/7,0,1)*K((Math.hypot(x,z)-8)/8,0,1)}
+function hh(x,z){return hb(x,z)-1.9*Math.max(box(x,-48,-40),box(x,-66,-58))}
+function inO(x,k){var o=OB[k==="gap"?1:2];return x>o.a&&x<o.b}
+var tg=new T.PlaneGeometry(150,90,75,45);tg.rotateX(-Math.PI/2);tg.translate(-37,0,0);var tp=tg.attributes.position;
+for(var v=0;v<tp.count;v++)tp.setY(v,hh(tp.getX(v),tp.getZ(v)));
+tg.setAttribute("color",new T.BufferAttribute(new Float32Array(tp.count*3),3));
+sc.add(new T.Mesh(tg,new T.MeshLambertMaterial({vertexColors:true,flatShading:true})));
+var gray=new T.Color(0x6d7476),tc=new T.Color(),prog=0,progT=0;
+function rest(x,p){return K((x-(-8-p*92))/12,0,1)}
+var trees=[];
+function paint(all){var p=all?1:prog,c=tg.attributes.color;for(var v=0;v<c.count;v++){var x=tp.getX(v),z=tp.getZ(v);
+  tc.set(0x4aa856).offsetHSL(Math.sin(x*.2)*.02,0,Math.sin(x*.9+z*.7)*.04);if(Math.hypot(x,z)<8)tc.set(0xc9ba8c);else tc.lerp(gray,1-rest(x,p));c.setXYZ(v,tc.r,tc.g,tc.b)}
+  c.needsUpdate=true;trees.forEach(function(t){t.m.color.copy(gray).lerp(t.g,rest(t.x,p))});sky(all?1:p*.9+.05)}
+function sky(k){sc.background.lerpColors(SK0,SK1,k);sc.fog.color.copy(sc.background)}
+var TM=new T.MeshLambertMaterial({color:0x6b4a30});
+for(var x=-12;x>-104;x-=2.6)[-1,1].forEach(function(s){var z=s*(12.5+Math.random()*17),xx=x+Math.random()*2,g=new T.Group(),h=1+Math.random()*.8,f=new T.MeshLambertMaterial({flatShading:true});
+  g.add(M(CY(.35,.5,3*h),0x6b4a30,0,1.5*h,0));var c1=new T.Mesh(CO(2*h,3.4*h),f),c2=new T.Mesh(CO(1.5*h,3*h),f);c1.position.y=4*h;c2.position.y=5.6*h;g.add(c1,c2);g.position.set(xx,hh(xx,z),z);sc.add(g);
+  trees.push({m:f,x:xx,g:new T.Color(0x2e9a48).offsetHSL(Math.random()*.06,0,Math.random()*.08)})});
+var tree=new T.Group();tree.add(M(CY(1.1,1.8,7),0x6d4c2f,0,3.5,0));var crown=M(new T.IcosahedronGeometry(4.4,1),0x39c46a,0,9,0,0x0a3a18);tree.add(crown);
+var glow=new T.Mesh(SP(6.4),new T.MeshBasicMaterial({color:0xfff2a0,transparent:true,opacity:.18,blending:2,depthWrite:false}));glow.position.y=9;tree.add(glow);sc.add(tree);
+var seed=M(SP(.6),0xff8a3d,-82,1.8,0,0xff8a3d);sc.add(seed);var seedM="shrine";
+var fp=new Float32Array(900);for(var i=0;i<900;i+=3){fp[i]=-Math.random()*110;fp[i+1]=1+Math.random()*8;fp[i+2]=(Math.random()-.5)*50}
+var fg=new T.BufferGeometry();fg.setAttribute("position",new T.BufferAttribute(fp,3));var ff=new T.Points(fg,new T.PointsMaterial({color:0xfff0a0,size:.5,transparent:true,opacity:.85,blending:2,depthWrite:false}));sc.add(ff);
+// obstáculos visibles
+var wall=[];for(var z=-15;z<=15;z+=1.8){var b=M(new T.BoxGeometry(2.4,4+Math.random(),1.8),0x5a4a3c,-29,2,z);b.rotation.y=Math.random();sc.add(b);wall.push(b)}
+var pit=M(new T.PlaneGeometry(8,60),0x14141c,-44,-1.5,0);pit.rotation.x=-Math.PI/2;sc.add(pit);
+var wat=new T.Mesh(new T.PlaneGeometry(8,60),new T.MeshLambertMaterial({color:0x6b6a50,transparent:true,opacity:.92}));wat.rotation.x=-Math.PI/2;wat.position.set(-62,-.5,0);sc.add(wat);
+var planks=[],lilies=[];for(var i=0;i<10;i++){var pl=M(new T.BoxGeometry(.85,.14,5.6),0x8a6a3a,-47.6+i*.85,.12,0);pl.scale.setScalar(.001);sc.add(pl);planks.push(pl)}
+for(var i=0;i<7;i++){var li=M(CY(1.1,1.1,.1),0x5fd36a,-65+i*1.1,-.2,Math.sin(i*2)*1.2);li.scale.setScalar(.001);sc.add(li);lilies.push(li)}
+// objetivos
+var TG=[{k:"dig",x:-26.5,z:0,c:0xff8a3d},{k:"soil",x:-38,z:-3,c:0x7fe08a},{k:"soil",x:-38,z:3,c:0x7fe08a},{k:"fount",x:-62,z:0,c:0x9b59ff},{k:"shr",x:-82,z:0,c:0xffd36b}];
+TG.forEach(function(t){t.y=hh(t.x,t.z);t.r=M(new T.TorusGeometry(1.4,.12,8,24),t.c,t.x,t.y+.1,t.z,t.c);t.r.rotation.x=Math.PI/2;sc.add(t.r);
+  t.pl=M(CY(.5,.5,16),t.c,t.x,t.y+8,t.z,t.c);t.pl.material.transparent=true;t.pl.material.opacity=.35;t.pl.visible=false;sc.add(t.pl);t.done=false});
+var fnt=M(new T.OctahedronGeometry(1.3),0x555560,-62,.8,0);sc.add(fnt);
+var npc=new T.Group();npc.add(M(SP(.6),0x9a6a3a,0,.7,0),M(SP(.38),0xb98a55,0,1.45,.2),M(SP(.8),0xc89a5c,0,.9,-.8),M(SP(.2),0xffd36b,0,2.6,0,0xffd36b));npc.position.set(-12,hh(-12,5),5);sc.add(npc);
+var grows=[];function grow(o,d){o.scale.setScalar(.001);grows.push({o:o,t:-.2,d:d||1.2})}
+// ---------- personajes ----------
+var cur=0,form=0,P=new T.Group(),gm;sc.add(P);P.visible=false;
+function fairy(i){var g=new T.Group(),p=G[i].o||[G[i].c,0xffffff],w=[];g.add(M(CO(.55,1.2),p[0],0,.9,0),M(SP(.28),0xffe0c8,0,1.7,0),M(SP(.31),G[i].c,0,1.84,-.05),M(CY(.03,.03,1.1),0x8a6a3a,.55,1.1,.3),M(SP(.12),0xfffacc,.55,1.7,.3,0xffee88));g.children[2].scale.set(1,.8,1);
+  for(var k=-1;k<=1;k+=2){var a=new T.Mesh(new T.CircleGeometry(.8,14),new T.MeshBasicMaterial({color:p[1],transparent:true,opacity:.7,side:2}));a.position.set(k*.45,1.4,-.25);a.scale.set(.55,1,1);a.rotation.y=k*.7;g.add(a);w.push(a);if(i==0)g.add(M(CO(.12,.4),G[i].c,k*.18,2.1,0))}
+  if(i==1)g.add(M(SP(.5),0x5b9a6a,0,1.1,-.45));g.userData.w=w;return g}
+function beast(i){var g=new T.Group(),c=G[i].c,p=G[i].o;
+  if(i==0){var b=M(SP(.6),c,0,.8,0);b.scale.set(1,.8,1.6);g.add(b,M(SP(.4),c,0,1.2,.95),M(CO(.15,.45),c,-.22,1.75,.95),M(CO(.15,.45),c,.22,1.75,.95),M(CO(.32,1),0xffffff,0,.9,-1.2),M(SP(.2),p[0],0,1.3,.2));g.children[4].rotation.x=-2}
+  else{var s=M(SP(1),p[0],0,.9,0);s.scale.set(1,.7,1.2);g.add(s,M(SP(.38),0xb6d98a,0,.7,1.2),M(CY(.9,.9,.2),0x9cc77a,0,.35,0),M(SP(.5),p[1],0,1.4,0,0x223322))}
+  g.userData.w=[];return g}
+function setModel(){if(gm)P.remove(gm);gm=(form?beast:fairy)(cur);P.add(gm)}
+var fx=[];function burst(x,y,z,c,n,sp){for(var k=0;k<n;k++){var m=M(SP(.13),c,x,y,z,c);m.material.transparent=true;sc.add(m);var a=Math.random()*6.28,s=(sp||4)*(.4+Math.random());fx.push({m:m,v:new T.Vector3(Math.cos(a)*s,2+Math.random()*3,Math.sin(a)*s),l:0})}}
+// ---------- estado ----------
+var st="title",keys={},yaw=Math.PI/2,pitch=.5,spoke=false,sniff=0,planted=0,taken=false,dlg=null,mt=0,locked=false;
+function msg(t,ms){var m=$("msg");m.textContent=t;m.style.opacity=1;clearTimeout(mt);mt=setTimeout(function(){m.style.opacity=0},ms||3500)}
+function setSt(s){st=s;$("title").classList.toggle("on",s=="title");$("end").classList.toggle("on",s=="end");$("hud").classList.toggle("on",s=="play");$("bars").classList.toggle("on",s=="cine");$("sub").classList.toggle("on",s=="cine");P.visible=(s=="play")}
+function say(lines,fn){var i=0;function show(){$("dlg").style.display="block";$("dlg").innerHTML="<b>Nuez, la ardilla</b><br>"+lines[i]+"<small>E · continuar</small>"}dlg={n:function(){i++;if(i>=lines.length){dlg=null;$("dlg").style.display="none";if(fn)fn()}else show()}};show()}
+function objective(){var t=!spoke?"Habla con Nuez, la ardilla (E).":!TG[0].done?"Un muro de raíces seco cierra el camino. Transfórmate en zorro y cava bajo la marca naranja.":planted<2?"Un abismo cierra el paso. Como hada, planta semillas en las 2 marcas verdes para hacer crecer un puente.":!OB[2].open?"El río está sucio. Cambia a la Tortuga (Tab), nada hasta la fuente morada y purifícala.":"¡El río está limpio! Vuelve a ser Zorro (Tab) y toma la Semilla de Luz al final del camino.";$("obj").innerHTML="<b>Objetivo</b><br>"+t}
+function gs(){$("gs").innerHTML="";G.forEach(function(g,i){var b=document.createElement("div");b.className="g p"+(i==cur?" on":"")+(g.lock?" l":"");b.innerHTML="<i style='background:#"+("000000"+g.c.toString(16)).slice(-6)+"'></i>"+(i+1)+" "+g.n+(g.lock?" 🔒":"");b.onclick=function(){pick(i)};$("gs").appendChild(b)})}
+function pick(i){if(st!="play"||dlg||i==cur)return;if(G[i].lock){msg(G[i].n+" sigue dormida. Se despertará en un capítulo futuro.",2500);return}cur=i;setModel();burst(P.position.x,1,P.position.z,G[i].c,18,6);gs();msg(G[i].n+" · "+(form?G[i].an:"hada"),1800)}
+function trans(){if(st!="play"||dlg)return;form=1-form;setModel();burst(P.position.x,1,P.position.z,0xffffff,20,6);burst(P.position.x,1,P.position.z,G[cur].c,20,6);msg(form?"¡Te transformas en "+G[cur].an+"!":"¡Vuelves a ser hada!",1800)}
+function nr(t,r){return Math.hypot(t.x-P.position.x,t.z-P.position.z)<r}
+function ability(){if(st!="play"||dlg)return;var i;
+  if(cur==0){
+    for(i=1;i<=2;i++){var s=TG[i];if(!s.done&&nr(s,4.5)){if(form){msg("Las semillas se plantan con magia: transfórmate en hada (Shift).",3000);return}s.done=true;planted++;var t=new T.Group();t.add(M(CY(.3,.4,3),0x6b4a30,0,1.5,0),M(CO(1.6,3),0x3cb35a,0,4,0));t.position.set(s.x,s.y,s.z);sc.add(t);grow(t,1.4);burst(s.x,1,s.z,0x7fe08a,24,5);s.r.visible=false;msg(planted<2?"¡Un árbol mágico brota! Falta una semilla más.":"¡Los árboles se entrelazan y forman un puente!",3500);
+        if(planted==2){OB[1].open=1;planks.forEach(function(p,k){grows.push({o:p,t:-.4-k*.12,d:.5})});progT+=.25}objective();return}}
+    if(form&&!TG[0].done&&nr(TG[0],4)){var d=TG[0];d.done=true;d.r.visible=false;wall.forEach(function(w){if(Math.abs(w.position.z)<3.4)w.visible=false});OB[0].open=1;burst(d.x,1,0,0x8a6a3a,40,8);msg("¡Cavaste un túnel bajo el muro de raíces!",3500);progT+=.2;objective();return}
+    sniff=6;msg("¡Olfato mágico! Sigue las columnas de luz.",2500)}
+  else if(cur==1){var f=TG[3];if(!f.done&&nr(f,4.5)){f.done=true;f.r.visible=false;OB[2].open=1;fnt.material.color.set(0x30e0e0);fnt.material.emissive.set(0x108a9a);wat.material.color.set(0x30d0e0);lilies.forEach(function(l,k){grows.push({o:l,t:-k*.15,d:.5})});burst(f.x,1,0,0x30e0e0,50,9);msg("¡Tortuga purificó el río! Ahora Zorro puede cruzar: cambia con Tab.",5000);progT+=.3;objective()}else msg("La Tortuga puede nadar en forma animal (Shift). Busca la fuente morada en el río.",3500)}}
+function interact(){if(dlg){dlg.n();return}if(st!="play")return;
+  if(Math.hypot(npc.position.x-P.position.x,npc.position.z-P.position.z)<6){say(["¡Guardiana, por fin despiertas! Soy Nuez. La Mancha secó el Bosque Susurrante y escondió una Semilla de Luz al final del camino.","Un muro de raíces secas cierra el paso. Tú, Zorro, puedes cavar por debajo: pulsa Shift para ser zorro y Espacio junto a la marca naranja.","Y recuerda: ninguna guardiana puede salvar el mundo sola. Cuando algo te supere, ¡cambia de guardiana con Tab!"],function(){spoke=true;objective()});return}
+  if(!taken&&OB[2].open&&nr(TG[4],4.5)){taken=true;burst(-82,2,0,0xffd36b,60,10);progT=1;seedM="fly";$("fade").style.opacity=1;setTimeout(function(){$("fade").style.opacity=0;cine(OUTRO,function(){setSt("end")})},600)}}
+// ---------- cinemáticas ----------
+var INTRO=[["Hace mucho tiempo, el Árbol de la Vida mantenía en equilibrio al Bosque, el Agua, las Flores y el Aire.",[0,8,32],[0,8,0],1],["Pero nació La Mancha, una sombra gris hecha de contaminación y descuido.",[-26,7,16],[0,7,0],0],["La Mancha rompió el Corazón del Árbol en cuatro Semillas de Luz y las escondió en los cuatro reinos.",[0,16,14],[0,10,0],0],["Cuatro guardianas despertaron: hadas que se transforman en animales. Cada una abre caminos que las demás no pueden. Empieza el Bosque Susurrante, con Zorro.",[-8,4,12],[-14,2,0],0]];
+var OUTRO=[["La primera Semilla de Luz volvió al Árbol de la Vida, y el bosque recuperó su color.",[8,10,24],[0,9,0],1],["Pero quedan tres semillas, y cada una exige a una guardiana distinta.",[-4,12,26],[0,9,0],1]];
+var B,bi,bn,bt,lk=new T.Vector3(0,8,0),after;
+function cine(l,fn){B=l;bi=-1;after=fn;setSt("cine");next()}
+function next(){bi++;if(bi>=B.length){after();return}var b=B[bi];bn=0;bt=0;paint(b[3])}
+function cineStep(dt){var b=B[bi];bn=Math.min(b[0].length,bn+dt*38);$("sub").textContent=b[0].slice(0,bn|0);if(bn>=b[0].length)bt+=dt;cam.position.lerp(new T.Vector3(b[1][0],b[1][1],b[1][2]),dt*.7);lk.lerp(new T.Vector3(b[2][0],b[2][1],b[2][2]),dt*1.2);cam.lookAt(lk);if(bt>4.2)next()}
+function start(){setSt("play");paint();P.position.set(2,0,3);yaw=Math.PI/2;P.rotation.y=-Math.PI/2;setModel();gs();objective();msg("Haz clic en el juego para mover la cámara con el mouse. Habla con Nuez la ardilla (E).",6000)}
+// ---------- bucle ----------
+function blk(x,z){for(var i=0;i<3;i++){var o=OB[i];if(x>o.a&&x<o.b){if(i==2&&cur==1&&form)return false;if(o.open&&Math.abs(z)<3)return false;return true}}return false}
+function fy(x,z){if(x>-48&&x<-40&&OB[1].open)return .15;if(x>-66&&x<-58){if(OB[2].open)return .15;if(cur==1&&form)return-.3}return hh(x,z)}
+function play(dt,t){var f=(keys.KeyW||keys.ArrowUp?1:0)-(keys.KeyS||keys.ArrowDown?1:0),rt=(keys.KeyD?1:0)-(keys.KeyA?1:0),sp=form?10:7;
+  if(keys.ArrowLeft)yaw+=dt*1.9;if(keys.ArrowRight)yaw-=dt*1.9;
+  if((f||rt)&&!dlg){var dx=-Math.sin(yaw)*f+Math.cos(yaw)*rt,dz=-Math.cos(yaw)*f-Math.sin(yaw)*rt,l=Math.hypot(dx,dz);dx/=l;dz/=l;var nx=P.position.x+dx*sp*dt,nz=P.position.z+dz*sp*dt;
+    if(nx<-16)nz=K(nz,-13.5,13.5);if(!blk(nx,P.position.z))P.position.x=K(nx,-90,40);if(!blk(P.position.x,nz))P.position.z=K(nz,-40,40);
+    var h=Math.hypot(P.position.x,P.position.z);if(h<3.4){P.position.x*=3.4/h;P.position.z*=3.4/h}
+    var ta=Math.atan2(dx,dz),da=Math.atan2(Math.sin(ta-P.rotation.y),Math.cos(ta-P.rotation.y));P.rotation.y+=da*Math.min(1,dt*14)}
+  P.position.y=fy(P.position.x,P.position.z)+(!form?.55+Math.sin(t*3)*.12:0);
+  if(gm.userData.w)gm.userData.w.forEach(function(w,k){w.rotation.z=Math.sin(t*9)*.5*(k%2?-1:1)});
+  sniff-=dt;TG.forEach(function(g,i){var on=!g.done&&(i<3||i==3&&OB[1].open||i==4&&OB[2].open);g.r.visible=on&&!g.done;g.r.scale.setScalar(1+Math.sin(t*4+i)*.12);g.pl.visible=on&&sniff>0});
+  var pr="";if(!dlg){if(Math.hypot(npc.position.x-P.position.x,npc.position.z-P.position.z)<6)pr="E · Hablar con Nuez";
+    else if(cur==0){if(!TG[0].done&&nr(TG[0],4))pr=form?"Espacio · Cavar bajo el muro":"Shift · conviértete en zorro para cavar";
+      for(var i=1;i<=2;i++)if(!TG[i].done&&nr(TG[i],4.5))pr=form?"Shift · conviértete en hada para plantar":"Espacio · Plantar semilla mágica"}
+    else if(cur==1&&!TG[3].done&&nr(TG[3],4.5))pr="Espacio · Purificar la fuente";
+    if(!taken&&OB[2].open&&nr(TG[4],4.5))pr="E · Tomar la Semilla de Luz"}
+  $("pr").style.display=pr?"block":"none";$("pr").textContent=pr;
+  var cd=12,cp=pitch;cam.position.set(P.position.x+Math.sin(yaw)*cd*Math.cos(cp),P.position.y+cd*Math.sin(cp)+1.2,P.position.z+Math.cos(yaw)*cd*Math.cos(cp));cam.lookAt(P.position.x,P.position.y+1.5,P.position.z)}
+var g_=0,clk=new T.Clock();
+function loop(){requestAnimationFrame(loop);var dt=Math.min(clk.getDelta(),.05),t=clk.elapsedTime;
+  if(Math.abs(progT-prog)>.003){prog+=(progT-prog)*dt*1.2;if(st=="play")paint()}
+  crown.scale.setScalar(1+Math.sin(t*2)*.03);glow.material.opacity=.1+.1*(.4+prog)+Math.sin(t*2)*.03;ff.rotation.y=t*.02;
+  npc.children[3].position.y=2.6+Math.sin(t*3)*.15;npc.rotation.y=Math.sin(t*.8)*.4;fnt.rotation.y=t;
+  for(var i=grows.length-1;i>=0;i--){var g=grows[i];g.t+=dt;if(g.t<0)continue;var e=Math.min(1,g.t/g.d);e=1-Math.pow(1-e,3);g.o.scale.setScalar(Math.max(.001,e));if(g.t>=g.d)grows.splice(i,1)}
+  if(seedM=="shrine"){seed.position.y=1.8+Math.sin(t*2)*.3;seed.visible=true}else{var q=t*1.1;seed.position.x+=(Math.cos(q)*3.4-seed.position.x)*dt*2;seed.position.y+=(11-seed.position.y)*dt*2;seed.position.z+=(Math.sin(q)*3.4-seed.position.z)*dt*2}
+  for(var k=fx.length-1;k>=0;k--){var f=fx[k];f.l+=dt;f.v.y-=9*dt;f.m.position.addScaledVector(f.v,dt);f.m.material.opacity=Math.max(0,1-f.l/1.1);if(f.l>1.1){sc.remove(f.m);fx.splice(k,1)}}
+  if(st=="title"){var a=t*.12;cam.position.set(Math.sin(a)*32,9+Math.sin(t*.3)*2,Math.cos(a)*32);cam.lookAt(0,8,0)}
+  else if(st=="cine")cineStep(dt);else if(st=="play")play(dt,t);
+  ren.render(sc,cam)}
+// ---------- entrada ----------
+addEventListener("keydown",function(e){keys[e.code]=1;if(e.code=="Space"||e.code=="Tab")e.preventDefault();
+  if(st=="cine"&&(e.code=="Enter"||e.code=="Space")){next();return}if(st!="play")return;
+  if(e.code=="Space"&&!e.repeat)ability();if(e.code=="KeyE"&&!e.repeat)interact();if((e.code=="ShiftLeft"||e.code=="ShiftRight")&&!e.repeat)trans();
+  if(e.code=="Tab")pick(cur==0?1:0);if(e.code>="Digit1"&&e.code<="Digit4")pick(+e.code.slice(5)-1)});
+addEventListener("keyup",function(e){keys[e.code]=0});
+var pd=null;cv.addEventListener("pointerdown",function(e){pd=[e.clientX,e.clientY];if(st=="cine")next();if(st=="play"&&cv.requestPointerLock&&!document.pointerLockElement)try{cv.requestPointerLock()}catch(x){}});
+cv.addEventListener("pointermove",function(e){if(st!="play")return;if(document.pointerLockElement===cv||e.buttons&1){yaw-=e.movementX*.004;pitch=K(pitch+e.movementY*.003,.15,1.1)}});
+$("sub").onclick=next;$("dlg").onclick=function(){if(dlg)dlg.n()};
+$("play").onclick=function(){cine(INTRO,start)};
+function resize(){var w=$("w").clientWidth,h=$("w").clientHeight;ren.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix()}
+addEventListener("resize",resize);resize();paint(1);loop();
+})();
+</script>
+</body>
+</html>
