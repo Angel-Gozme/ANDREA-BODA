@@ -15,23 +15,19 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .mono{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase}
 
-/* Cuadrícula y Canvas 3D (detrás de las tarjetas) */
 #grid{position:fixed;inset:0;z-index:3;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px),linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);background-size:60px 60px,60px 60px,300px 300px,300px 300px;-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 30%,rgba(0,0,0,.35) 100%);mask-image:radial-gradient(ellipse at 50% 50%,#000 30%,rgba(0,0,0,.35) 100%)}
 #gl{position:fixed;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
 .wrap{position:relative;z-index:10}
 
-/* Loader */
 #loader{position:fixed;inset:0;z-index:300;background:#050607;clip-path:polygon(0 0,100% 0,100% 100%,0 100%);display:flex;align-items:center;justify-content:center}
 #loader svg{width:90px;animation:spin 3s linear infinite}
 @keyframes spin{to{transform:rotateY(360deg)}}
 #loader .lt{position:absolute;left:3vw;top:3vh}
 #pct{position:absolute;left:3vw;bottom:2vh;font-family:'Space Grotesk';font-weight:700;font-size:clamp(4rem,14vw,12rem);line-height:1;letter-spacing:-.05em}
 
-/* Cursor */
 #cur{position:fixed;left:0;top:0;width:28px;height:28px;margin:-14px 0 0 -14px;border:1.5px solid #fff;border-radius:50%;pointer-events:none;z-index:400;mix-blend-mode:difference;transition:width .3s,height .3s,margin .3s}
 #cur.h{width:60px;height:60px;margin:-30px 0 0 -30px}
 
-/* Header y HUD */
 #hdr{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:2.4vh 3vw;mix-blend-mode:difference;color:#fff;flex-wrap:wrap;gap:8px}
 .logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;letter-spacing:-.02em;font-size:15px;cursor:pointer}
 .logo svg{width:20px}
@@ -47,23 +43,22 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .br{right:3vw;bottom:3vh;display:flex;gap:10px}
 .ticks{position:fixed;left:0;top:20vh;height:60vh;width:8px;z-index:50;mix-blend-mode:difference;background:repeating-linear-gradient(to bottom,#fff 0 1px,transparent 1px 12px);opacity:.5}
 
-/* Hero */
 .hero-in{min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:11vh 3vw 9vh;text-align:center}
-.wm{font-family:'Space Grotesk';font-weight:700;font-size:clamp(5rem,25vw,30rem);line-height:.85;letter-spacing:-.06em;margin:auto 0}
+.hero-center { margin: auto 0; }
+.wm{font-family:'Space Grotesk';font-weight:700;font-size:clamp(5rem,25vw,30rem);line-height:.85;letter-spacing:-.06em;}
+.subtitle { margin-top: 2vh; font-size: 13px; opacity: 0.8; letter-spacing: 0.15em; }
 .mk{display:inline-block;overflow:hidden;vertical-align:top;padding:.03em .02em}
 .mk i{display:inline-block;font-style:normal}
 .hero-bot{display:flex;justify-content:space-between;align-items:flex-end;text-align:left;gap:3vw;flex-wrap:wrap}
 .hero-bot p{max-width:300px;font-size:13px;line-height:1.6;opacity:.75}
-#hlist{list-style:none;display:flex;flex-direction:column;gap:6px}
-#hlist a{opacity:.7;transition:.3s;cursor:pointer}
-#hlist a:hover{opacity:1;color:var(--g)}
 
-/* Carruseles 3D (Videos y Piezas) */
+.hf { opacity: 0; transform: translateY(20px); }
+
 .carousel-sec{height:100vh;overflow:hidden;position:relative;z-index:8}
 .ghost{position:absolute;left:0;top:50%;margin-top:-.52em;font-family:'Space Grotesk';font-weight:700;font-size:34vw;line-height:1;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.13);z-index:2;pointer-events:none}
 .wtop{position:absolute;top:11vh;left:3vw;z-index:20}
 .stage{position:absolute;inset:0;perspective:1600px;z-index:10}
-.card{position:absolute;left:50%;top:46%;cursor:pointer;will-change:transform,opacity,z-index}
+.card{position:absolute;left:50%;top:46%;cursor:pointer;will-change:transform,opacity}
 .card.v{height:56vh;aspect-ratio:9/16}
 .card.h{width:min(60vw,98vh);aspect-ratio:16/9}
 .cin{width:100%;height:100%;overflow:hidden;border:1px solid rgba(255,255,255,.22);background:#0b1114;box-shadow:0 40px 90px -20px rgba(6,182,212,.4)}
@@ -76,7 +71,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .wctl button{width:42px;height:42px;border:1px solid var(--line2);border-radius:50%;transition:.3s;background:rgba(5,6,7,.6)}
 .wctl button:hover{background:#fff;color:#000}
 
-/* Visión (Fondo blanco con transición) */
 #vision{position:relative;min-height:115vh;color:#0b1220;z-index:2}
 #vbg{position:absolute;inset:0;background:#fff;z-index:0}
 .vin{padding:22vh 3vw 14vh;max-width:1400px;position:relative;z-index:10}
@@ -86,7 +80,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .vrow{display:flex;align-items:flex-end;gap:2vw;margin-top:7vh}
 .tri-img{width:clamp(120px,15vw,230px);aspect-ratio:1;clip-path:polygon(50% 0,100% 100%,0 100%);object-fit:cover;background:linear-gradient(135deg,var(--g),var(--b))}
 
-/* Servicios y Contacto (Fondo negro sólido z-index: 14 para tapar el 3D) */
 #services{padding:18vh 3vw 8vh;position:relative;z-index:14;background:var(--bg)}
 .row{display:grid;grid-template-columns:90px 1fr 1.1fr;align-items:center;gap:2vw;padding:3.4vh 0;border-top:1px solid var(--line2);position:relative;z-index:1;overflow:hidden}
 .row::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,185,129,.2),rgba(14,165,233,.2));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.7,0,.2,1);z-index:-1}
@@ -104,7 +97,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .crow:hover{padding-left:2vw;color:var(--g)}
 .foot{display:flex;justify-content:space-between;margin-top:10vh;opacity:.6;flex-wrap:wrap;gap:10px}
 
-/* Modal */
 #modal{position:fixed;inset:0;z-index:200;background:rgba(3,5,6,.95);display:none;align-items:center;justify-content:center}
 #mclose{position:absolute;top:3vh;right:3vw;border:1px solid var(--line2);padding:10px 18px;border-radius:50px;z-index:10}
 #mbox{display:flex;gap:3vw;align-items:center;max-width:94vw;max-height:88vh}
@@ -174,11 +166,15 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <!-- Hero -->
   <section id="hero" data-tri="0,0,1.9,1" data-name="Inicio">
     <div class="wrap hero-in">
-      <div class="mono hf">Angel — Diseñador gráfico digital &amp; editor de video</div>
-      <h1 class="wm" id="wm">ANGEL</h1>
+      <div></div>
+      
+      <div class="hero-center">
+        <h1 class="wm" id="wm">ANGEL</h1>
+        <div class="mono hf subtitle">Diseñador gráfico digital &amp; editor de video</div>
+      </div>
+      
       <div class="hero-bot">
         <p class="hf">Creo experiencias visuales únicas que conectan marcas con su audiencia.</p>
-        <ul id="hlist" class="mono hf"></ul>
         <div class="mono hf">Scroll para explorar →</div>
       </div>
     </div>
@@ -282,7 +278,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
 const pad = i => String(i + 1).padStart(2, '0');
 
-// Failsafe para asegurar que el loader nunca bloquee la pantalla
 let appStarted = false;
 function hideLoaderFallback() {
   if (appStarted) return;
@@ -299,7 +294,6 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   gsap.registerPlugin(ScrollTrigger);
 
-  // Datos de Videos (10) y Piezas Gráficas (10) repetidos para alcanzar la cuota
   const VIDEOS = [
     { t: 'Hegatrux', c: 'Video Marketing', d: 'Presentación de nuevo logo con animación dinámica', k: 'v', a: 'v', s: 'https://i.imgur.com/6ZYS0Tj.mp4' },
     { t: 'UCSM Ordinario', c: 'Video Institucional', d: 'Proceso de admisión universitaria', k: 'v', a: 'v', s: 'https://i.imgur.com/c7axOnW.mp4' },
@@ -326,14 +320,6 @@ window.addEventListener('DOMContentLoaded', () => {
     { t: 'Diseño Horizontal 10', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/4hqLvND.jpeg' }
   ];
 
-  // Enlaces rápidos en el Hero (primeros 4 videos)
-  VIDEOS.slice(0, 4).forEach((p, i) => {
-    const li = document.createElement('li');
-    li.innerHTML = `<a data-vcard="${i}">${pad(i)} ${p.t} ↗</a>`;
-    $('#hlist').appendChild(li);
-  });
-
-  // Constructor reutilizable de Carruseles 3D con ScrollTrigger
   function createCarousel({ items, sectionSel, stageSel, ghostSel, txtSel, catSel, titleSel, descSel, idxSel, prevSel, nextSel, scrollMult }) {
     const count = items.length;
     const state = { cur: 0, idx: -1 };
@@ -382,8 +368,6 @@ window.addEventListener('DOMContentLoaded', () => {
         el.style.opacity = op;
         el.style.filter = `brightness(${1 - Math.min(a, 1) * 0.55})`;
         el.style.pointerEvents = op > 0.1 ? 'auto' : 'none';
-        
-        // Z-Index Update to fix the overlap issue
         el.style.zIndex = Math.round(100 - (a * 10));
       });
       const activeIdx = Math.round(state.cur);
@@ -464,11 +448,8 @@ window.addEventListener('DOMContentLoaded', () => {
     scrollMult: 0.75
   });
 
-  addEventListener('resize', () => {
-    ScrollTrigger.refresh();
-  });
+  addEventListener('resize', () => { ScrollTrigger.refresh(); });
 
-  /* ---------- Modal con revelación triangular ---------- */
   function openModal(p) {
     $('#mcat').textContent = p.c;
     $('#mtitle').textContent = p.t;
@@ -500,11 +481,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   $('#mclose').onclick = closeModal;
-  addEventListener('keydown', e => {
-    if (e.key === 'Escape' && $('#modal').style.display === 'flex') closeModal();
-  });
+  addEventListener('keydown', e => { if (e.key === 'Escape' && $('#modal').style.display === 'flex') closeModal(); });
 
-  /* ---------- División de texto ---------- */
   function split(el) {
     const t = el.textContent;
     el.innerHTML = '';
@@ -521,7 +499,6 @@ window.addEventListener('DOMContentLoaded', () => {
   const wmI = split($('#wm')), chI = split($('#ch'));
   $('#vh').innerHTML = $('#vh').textContent.split(' ').map(w => `<span class="w">${w}</span>`).join(' ');
 
-  /* ---------- Three.js: Triángulo holográfico ---------- */
   const sink = { y: 0, a: 1 };
   let light = false;
   const cur = { x: 0, y: 0, s: 1.9, a: 1 }, tg = { x: 0, y: 0, s: 1.9, a: 1 };
@@ -603,7 +580,6 @@ window.addEventListener('DOMContentLoaded', () => {
     })();
   }
 
-  /* ---------- Scroll y transiciones de sección ---------- */
   const secs = $$('[data-tri]');
   let curSec = null;
 
@@ -629,14 +605,12 @@ window.addEventListener('DOMContentLoaded', () => {
   }
   addEventListener('scroll', onScroll, { passive: true });
 
-  // Transición fondo blanco en Visión
   gsap.fromTo('#vbg', { clipPath: 'polygon(50% 0%,56% 9%,44% 9%)' }, {
     clipPath: 'polygon(50% -150%,250% 250%,-150% 250%)',
     ease: 'none',
     scrollTrigger: { trigger: '#vision', start: 'top 95%', end: 'top 25%', scrub: true }
   });
 
-  // Descenso del triángulo 3D detrás del fondo negro al salir de Visión
   gsap.fromTo(sink, { y: 0, a: 1 }, {
     y: -6.2,
     a: 0,
@@ -676,7 +650,6 @@ window.addEventListener('DOMContentLoaded', () => {
     scrollTrigger: { trigger: '#contact', start: 'top 60%' }
   });
 
-  /* ---------- Navegación ---------- */
   function go(id) {
     let y = 0;
     if (id === 'videos') y = videoCarousel.getStart();
@@ -692,14 +665,12 @@ window.addEventListener('DOMContentLoaded', () => {
     if (c) { e.preventDefault(); videoCarousel.goTo(+c.dataset.vcard); }
   });
 
-  /* ---------- Cursor ---------- */
   if (matchMedia('(pointer:fine)').matches) {
     const c = $('#cur'), qx = gsap.quickTo(c, 'x', { duration: 0.25 }), qy = gsap.quickTo(c, 'y', { duration: 0.25 });
     addEventListener('pointermove', e => { qx(e.clientX); qy(e.clientY); });
     document.addEventListener('pointerover', e => c.classList.toggle('h', !!e.target.closest('a,button,.card,.row')));
   }
 
-  /* ---------- Secuencia de inicio ---------- */
   onScroll();
   const L = { v: 0 };
   gsap.timeline({ delay: 0.15 })
@@ -712,7 +683,7 @@ window.addEventListener('DOMContentLoaded', () => {
     .to('#loader', { clipPath: 'polygon(0 0,100% 0,100% 0,0 0)', duration: 0.85, ease: 'power4.inOut' }, '+=0.1')
     .set('#loader', { display: 'none', onComplete: () => { appStarted = true; } })
     .fromTo(wmI, { yPercent: 110 }, { yPercent: 0, stagger: 0.09, duration: 1.1, ease: 'power4.out', immediateRender: true }, '-=0.3')
-    .from('.hf', { opacity: 0, y: 20, stagger: 0.1, duration: 0.8, ease: 'power3.out' }, '-=0.7')
+    .to('.hf', { opacity: 1, y: 0, stagger: 0.1, duration: 0.8, ease: 'power3.out' }, '-=0.7')
     .from('#hdr', { opacity: 0, y: -30, duration: 0.8, ease: 'power3.out' }, '-=0.8');
 
   addEventListener('load', () => ScrollTrigger.refresh());
