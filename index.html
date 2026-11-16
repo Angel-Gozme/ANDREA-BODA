@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANGEL GOZME — Portafolio</title>
+<link rel="icon" type="image/png" href="https://i.imgur.com/9eSvFcN.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.16);--g:#10b981;--c:#06b6d4;--b:#0ea5e9;--bg:#050607}
+body.light{--line:rgba(15,23,42,.08);--line2:rgba(15,23,42,.2)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:#fff;font-family:'Inter',sans-serif;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+.mono{font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.09em;text-transform:uppercase}
+
+/* Cuadrícula y Canvas 3D (detrás de las tarjetas) */
+#grid{position:fixed;inset:0;z-index:3;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px),linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);background-size:60px 60px,60px 60px,300px 300px,300px 300px;-webkit-mask-image:radial-gradient(ellipse at 50% 50%,#000 30%,rgba(0,0,0,.35) 100%);mask-image:radial-gradient(ellipse at 50% 50%,#000 30%,rgba(0,0,0,.35) 100%)}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:4;pointer-events:none}
+.wrap{position:relative;z-index:10}
+
+/* Loader */
+#loader{position:fixed;inset:0;z-index:300;background:#050607;clip-path:polygon(0 0,100% 0,100% 100%,0 100%);display:flex;align-items:center;justify-content:center}
+#loader svg{width:90px;animation:spin 3s linear infinite}
+@keyframes spin{to{transform:rotateY(360deg)}}
+#loader .lt{position:absolute;left:3vw;top:3vh}
+#pct{position:absolute;left:3vw;bottom:2vh;font-family:'Space Grotesk';font-weight:700;font-size:clamp(4rem,14vw,12rem);line-height:1;letter-spacing:-.05em}
+
+/* Cursor */
+#cur{position:fixed;left:0;top:0;width:28px;height:28px;margin:-14px 0 0 -14px;border:1.5px solid #fff;border-radius:50%;pointer-events:none;z-index:400;mix-blend-mode:difference;transition:width .3s,height .3s,margin .3s}
+#cur.h{width:60px;height:60px;margin:-30px 0 0 -30px}
+
+/* Header y HUD */
+#hdr{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:2.4vh 3vw;mix-blend-mode:difference;color:#fff;flex-wrap:wrap;gap:8px}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Space Grotesk';font-weight:700;letter-spacing:-.02em;font-size:15px;cursor:pointer}
+.logo svg{width:20px}
+#hdr nav{display:flex;gap:2.4vw}
+#hdr nav a{font-size:12px;font-weight:500;opacity:.7;transition:opacity .3s;cursor:pointer}
+#hdr nav a:hover,#hdr nav a.on{opacity:1}
+.hr{display:flex;align-items:center;gap:14px}
+.pill{border:1px solid #fff;border-radius:50px;padding:8px 18px;font-size:11px;font-weight:600;transition:.3s}
+.pill:hover{background:#fff;color:#000}
+.ring{width:36px;height:36px}
+.hud{position:fixed;z-index:50;mix-blend-mode:difference;color:#fff;opacity:.85}
+.bl{left:3vw;bottom:3vh}
+.br{right:3vw;bottom:3vh;display:flex;gap:10px}
+.ticks{position:fixed;left:0;top:20vh;height:60vh;width:8px;z-index:50;mix-blend-mode:difference;background:repeating-linear-gradient(to bottom,#fff 0 1px,transparent 1px 12px);opacity:.5}
+
+/* Hero */
+.hero-in{min-height:100vh;display:flex;flex-direction:column;justify-content:space-between;padding:11vh 3vw 9vh;text-align:center}
+.wm{font-family:'Space Grotesk';font-weight:700;font-size:clamp(5rem,25vw,30rem);line-height:.85;letter-spacing:-.06em;margin:auto 0}
+.mk{display:inline-block;overflow:hidden;vertical-align:top;padding:.03em .02em}
+.mk i{display:inline-block;font-style:normal}
+.hero-bot{display:flex;justify-content:space-between;align-items:flex-end;text-align:left;gap:3vw;flex-wrap:wrap}
+.hero-bot p{max-width:300px;font-size:13px;line-height:1.6;opacity:.75}
+#hlist{list-style:none;display:flex;flex-direction:column;gap:6px}
+#hlist a{opacity:.7;transition:.3s;cursor:pointer}
+#hlist a:hover{opacity:1;color:var(--g)}
+
+/* Carruseles 3D (Videos y Piezas) */
+.carousel-sec{height:100vh;overflow:hidden;position:relative;z-index:8}
+.ghost{position:absolute;left:0;top:50%;margin-top:-.52em;font-family:'Space Grotesk';font-weight:700;font-size:34vw;line-height:1;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.13);z-index:2;pointer-events:none}
+.wtop{position:absolute;top:11vh;left:3vw;z-index:20}
+.stage{position:absolute;inset:0;perspective:1600px;z-index:10}
+.card{position:absolute;left:50%;top:46%;cursor:pointer;will-change:transform,opacity,z-index}
+.card.v{height:56vh;aspect-ratio:9/16}
+.card.h{width:min(60vw,98vh);aspect-ratio:16/9}
+.cin{width:100%;height:100%;overflow:hidden;border:1px solid rgba(255,255,255,.22);background:#0b1114;box-shadow:0 40px 90px -20px rgba(6,182,212,.4)}
+.cin video,.cin img{width:100%;height:100%;object-fit:cover;display:block}
+.cn{position:absolute;left:10px;top:10px;color:#fff;background:rgba(0,0,0,.55);padding:3px 7px}
+.winfo{position:absolute;left:0;right:0;bottom:0;padding:0 3vw 9vh;display:flex;justify-content:space-between;align-items:flex-end;z-index:20}
+.wtitle{font-family:'Space Grotesk';font-size:1.5rem;letter-spacing:-.02em;margin:4px 0}
+.wdesc{font-size:12px;opacity:.65;max-width:300px}
+.wctl{display:flex;align-items:center;gap:14px}
+.wctl button{width:42px;height:42px;border:1px solid var(--line2);border-radius:50%;transition:.3s;background:rgba(5,6,7,.6)}
+.wctl button:hover{background:#fff;color:#000}
+
+/* Visión (Fondo blanco con transición) */
+#vision{position:relative;min-height:115vh;color:#0b1220;z-index:2}
+#vbg{position:absolute;inset:0;background:#fff;z-index:0}
+.vin{padding:22vh 3vw 14vh;max-width:1400px;position:relative;z-index:10}
+.vin h2{font-family:'Space Grotesk';font-weight:700;font-size:clamp(2.4rem,6.2vw,7rem);letter-spacing:-.04em;line-height:1;width:62%}
+.vin .w{opacity:.12;display:inline-block}
+.vin p{margin-top:5vh;max-width:420px;font-size:15px;line-height:1.7;color:#334155}
+.vrow{display:flex;align-items:flex-end;gap:2vw;margin-top:7vh}
+.tri-img{width:clamp(120px,15vw,230px);aspect-ratio:1;clip-path:polygon(50% 0,100% 100%,0 100%);object-fit:cover;background:linear-gradient(135deg,var(--g),var(--b))}
+
+/* Servicios y Contacto (Fondo negro sólido z-index: 14 para tapar el 3D) */
+#services{padding:18vh 3vw 8vh;position:relative;z-index:14;background:var(--bg)}
+.row{display:grid;grid-template-columns:90px 1fr 1.1fr;align-items:center;gap:2vw;padding:3.4vh 0;border-top:1px solid var(--line2);position:relative;z-index:1;overflow:hidden}
+.row::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(16,185,129,.2),rgba(14,165,233,.2));transform:scaleX(0);transform-origin:left;transition:transform .5s cubic-bezier(.7,0,.2,1);z-index:-1}
+.row:hover::before{transform:scaleX(1)}
+.row h3{font-family:'Space Grotesk';font-weight:700;font-size:clamp(2rem,5.2vw,5.5rem);letter-spacing:-.04em;line-height:1;transition:transform .5s}
+.row:hover h3{transform:translateX(18px)}
+.row p{font-size:14px;line-height:1.6;opacity:.7;max-width:420px}
+.mqw{overflow:hidden;margin-top:12vh}
+.mq{display:flex;width:max-content;animation:mq 22s linear infinite;font-family:'Space Grotesk';font-weight:700;font-size:11vw;line-height:1;white-space:nowrap;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.35)}
+@keyframes mq{to{transform:translateX(-50%)}}
+
+#contact{padding:16vh 3vw 6vh;position:relative;z-index:14;background:var(--bg)}
+#contact h2{font-family:'Space Grotesk';font-weight:700;font-size:clamp(3.5rem,15vw,17rem);letter-spacing:-.06em;line-height:.9}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:3vh 0;border-top:1px solid var(--line2);font-family:'Space Grotesk';font-size:clamp(1.4rem,3.6vw,3.6rem);letter-spacing:-.03em;transition:.4s}
+.crow:hover{padding-left:2vw;color:var(--g)}
+.foot{display:flex;justify-content:space-between;margin-top:10vh;opacity:.6;flex-wrap:wrap;gap:10px}
+
+/* Modal */
+#modal{position:fixed;inset:0;z-index:200;background:rgba(3,5,6,.95);display:none;align-items:center;justify-content:center}
+#mclose{position:absolute;top:3vh;right:3vw;border:1px solid var(--line2);padding:10px 18px;border-radius:50px;z-index:10}
+#mbox{display:flex;gap:3vw;align-items:center;max-width:94vw;max-height:88vh}
+#mmedia video,#mmedia img{max-height:80vh;max-width:68vw;display:block;border:1px solid rgba(255,255,255,.22)}
+#minfo{max-width:280px}
+#mtitle{font-family:'Space Grotesk';font-size:2rem;letter-spacing:-.03em;margin:8px 0}
+#mdesc{font-size:13px;opacity:.7;line-height:1.6}
+
+@media(max-width:768px){
+  #hdr nav{order:3;width:100%;justify-content:center;gap:5vw}
+  .card.v{height:50vh}
+  .card.h{width:86vw}
+  .row{grid-template-columns:40px 1fr}
+  .row p{grid-column:2}
+  .vin h2{width:100%}
+  .hero-bot{flex-direction:column;align-items:flex-start}
+  #mbox{flex-direction:column}
+  #mmedia video,#mmedia img{max-width:90vw;max-height:58vh}
+  .winfo{padding-bottom:10vh}
+  .ticks{display:none}
+}
+@media(pointer:coarse){#cur{display:none}}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <svg viewBox="0 0 100 90" fill="none" stroke="#fff" stroke-width="5">
+    <polygon points="50,6 94,84 6,84"/>
+    <polygon points="50,38 72,76 28,76" stroke="#10b981"/>
+  </svg>
+  <div class="mono lt">Angel Gozme — Portafolio 2026</div>
+  <div id="pct">000</div>
+</div>
+
+<div id="cur"></div>
+<div id="grid"></div>
+<canvas id="gl"></canvas>
+<div class="ticks"></div>
+
+<header id="hdr">
+  <a class="logo" data-go="hero">
+    <svg viewBox="0 0 100 90" fill="none" stroke="#fff" stroke-width="9"><polygon points="50,8 92,82 8,82"/></svg>
+    ANGEL GOZME
+  </a>
+  <nav>
+    <a data-go="hero" class="on">Inicio</a>
+    <a data-go="videos">Videos</a>
+    <a data-go="pieces">Piezas</a>
+    <a data-go="vision">Visión</a>
+    <a data-go="services">Servicios</a>
+  </nav>
+  <div class="hr">
+    <a class="pill" href="https://cutt.ly/6rFeaLOj" target="_blank">Contacto</a>
+    <svg class="ring" viewBox="0 0 36 36">
+      <circle cx="18" cy="18" r="14" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="1.5"/>
+      <circle id="rp" cx="18" cy="18" r="14" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="88" stroke-dashoffset="88" transform="rotate(-90 18 18)"/>
+      <circle cx="18" cy="18" r="2" fill="#fff"/>
+    </svg>
+  </div>
+</header>
+
+<div class="hud bl mono" id="xy">X 0.000 · Y 0.000</div>
+<div class="hud br mono"><span id="sn">01 / 06</span><span id="sname">Inicio</span></div>
+
+<main>
+  <!-- Hero -->
+  <section id="hero" data-tri="0,0,1.9,1" data-name="Inicio">
+    <div class="wrap hero-in">
+      <div class="mono hf">Angel — Diseñador gráfico digital &amp; editor de video</div>
+      <h1 class="wm" id="wm">GOZME</h1>
+      <div class="hero-bot">
+        <p class="hf">Creo experiencias visuales únicas que conectan marcas con su audiencia.</p>
+        <ul id="hlist" class="mono hf"></ul>
+        <div class="mono hf">Scroll para explorar →</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección 01: Videos (Carrusel 3D) -->
+  <section id="videos" class="carousel-sec" data-tri="0,0,1.25,.32" data-name="Videos">
+    <div class="ghost" id="v-ghost">VIDEOS</div>
+    <div class="mono wtop">01 — Videos seleccionados</div>
+    <div class="stage" id="v-stage"></div>
+    <div class="winfo">
+      <div id="v-txt">
+        <div class="mono" id="v-cat"></div>
+        <h3 class="wtitle" id="v-title"></h3>
+        <p class="wdesc" id="v-desc"></p>
+      </div>
+      <div class="wctl">
+        <button id="v-prev">←</button>
+        <span class="mono" id="v-idx">01 / 10</span>
+        <button id="v-next">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección 02: Piezas Gráficas (Carrusel 3D idéntico) -->
+  <section id="pieces" class="carousel-sec" data-tri="0,0,1.25,.28" data-name="Piezas Gráficas">
+    <div class="ghost" id="p-ghost">PIEZAS</div>
+    <div class="mono wtop">02 — Piezas gráficas</div>
+    <div class="stage" id="p-stage"></div>
+    <div class="winfo">
+      <div id="p-txt">
+        <div class="mono" id="p-cat"></div>
+        <h3 class="wtitle" id="p-title"></h3>
+        <p class="wdesc" id="p-desc"></p>
+      </div>
+      <div class="wctl">
+        <button id="p-prev">←</button>
+        <span class="mono" id="p-idx">01 / 10</span>
+        <button id="p-next">→</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección 03: Visión -->
+  <section id="vision" data-tri="3.1,0,1.35,1" data-light="1" data-name="Visión">
+    <div id="vbg"></div>
+    <div class="wrap vin">
+      <div class="mono" style="margin-bottom:4vh">03 — Visión</div>
+      <h2 id="vh">Diseño y movimiento que conectan marcas con su audiencia.</h2>
+      <p>Soy Angel Gozme, diseñador gráfico digital y editor de video. Creo piezas para marcas, instituciones y proyectos culturales, donde cada detalle visual tiene un propósito.</p>
+      <div class="vrow">
+        <img class="tri-img" id="tri" src="https://i.imgur.com/9eSvFcN.png" alt="Angel Gozme">
+        <div class="mono">Video Editor<br>Designer<br>Motion</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección 04: Servicios -->
+  <section id="services" data-tri="0,-6.2,1,0" data-name="Servicios">
+    <div class="wrap">
+      <div class="mono" style="margin-bottom:6vh">04 — Servicios</div>
+      <div class="row"><span class="mono">01</span><h3>Edición de video</h3><p>Spots institucionales, contenido orgánico y piezas de marketing para marcas y universidades.</p></div>
+      <div class="row"><span class="mono">02</span><h3>Diseño gráfico</h3><p>Piezas visuales y campañas pensadas con criterio de marca y una dirección clara.</p></div>
+      <div class="row"><span class="mono">03</span><h3>Motion &amp; logos</h3><p>Presentaciones de marca con animación dinámica, como el reveal de logo de Hegatrux.</p></div>
+      <div class="row" style="padding:0;height:1px"></div>
+      <div class="mqw"><div class="mq"><span>VIDEO · DISEÑO · MOTION · VIDEO · DISEÑO · MOTION · </span><span>VIDEO · DISEÑO · MOTION · VIDEO · DISEÑO · MOTION · </span></div></div>
+    </div>
+  </section>
+
+  <!-- Sección 05: Contacto -->
+  <section id="contact" data-tri="0,-6.2,1,0" data-name="Contacto">
+    <div class="wrap">
+      <div class="mono" style="margin-bottom:4vh">05 — Contacto</div>
+      <h2 id="ch">Hablemos</h2>
+      <p style="margin:4vh 0 8vh;max-width:380px;font-size:14px;line-height:1.7;opacity:.7"><strong>Disponible para proyectos freelance.</strong><br>Respondo en menos de 24 horas.</p>
+      <a class="crow" href="https://cutt.ly/6rFeaLOj" target="_blank"><span>WhatsApp</span><span>↗</span></a>
+      <a class="crow" href="mailto:angelgozmel@gmail.com"><span>angelgozmel@gmail.com</span><span>↗</span></a>
+      <a class="crow" href="https://www.instagram.com/angel_gozme" target="_blank"><span>@angel_gozme</span><span>↗</span></a>
+      <div class="foot mono"><span>© 2026 Angel Gozme</span><span>Todos los derechos reservados</span></div>
+    </div>
+  </section>
+</main>
+
+<!-- Modal Lightbox -->
+<div id="modal">
+  <button id="mclose" class="mono">Cerrar ✕</button>
+  <div id="mbox">
+    <div id="mmedia"></div>
+    <div id="minfo">
+      <div class="mono" id="mcat"></div>
+      <h3 id="mtitle"></h3>
+      <p id="mdesc"></p>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const pad = i => String(i + 1).padStart(2, '0');
+
+// Failsafe para asegurar que el loader nunca bloquee la pantalla
+let appStarted = false;
+function hideLoaderFallback() {
+  if (appStarted) return;
+  appStarted = true;
+  const ld = $('#loader');
+  if (ld) ld.style.display = 'none';
+}
+setTimeout(hideLoaderFallback, 3200);
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') {
+    hideLoaderFallback();
+    return;
+  }
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Datos de Videos (10) y Piezas Gráficas (10) repetidos para alcanzar la cuota
+  const VIDEOS = [
+    { t: 'Hegatrux', c: 'Video Marketing', d: 'Presentación de nuevo logo con animación dinámica', k: 'v', a: 'v', s: 'https://i.imgur.com/6ZYS0Tj.mp4' },
+    { t: 'UCSM Ordinario', c: 'Video Institucional', d: 'Proceso de admisión universitaria', k: 'v', a: 'v', s: 'https://i.imgur.com/c7axOnW.mp4' },
+    { t: 'UCSM Orgánico', c: 'Contenido Orgánico', d: 'Cato XP con Pecado Capital', k: 'v', a: 'v', s: 'https://i.imgur.com/wXPjQfv.mp4' },
+    { t: 'UCSM Especialidades', c: 'Video Corporativo', d: 'Segundas especialidades en Derecho', k: 'v', a: 'h', s: 'https://i.imgur.com/V8G5Ixv.mp4' },
+    { t: 'UCSM Preca', c: 'Video Institucional', d: 'Proceso de admisión', k: 'v', a: 'v', s: 'https://i.imgur.com/HVO8a0s.mp4' },
+    { t: 'UCSM Ordinario 2', c: 'Video Institucional', d: 'Proceso de admisión', k: 'v', a: 'v', s: 'https://i.imgur.com/zNB6uIe.mp4' },
+    { t: 'El Narrador de Cuentos', c: 'Video Cultural', d: 'Teatro vivencial', k: 'v', a: 'v', s: 'https://i.imgur.com/El7Cbhb.mp4' },
+    { t: 'Hegatrux (Copy)', c: 'Video Marketing', d: 'Presentación de nuevo logo con animación dinámica', k: 'v', a: 'v', s: 'https://i.imgur.com/6ZYS0Tj.mp4' },
+    { t: 'UCSM Ordinario (Copy)', c: 'Video Institucional', d: 'Proceso de admisión universitaria', k: 'v', a: 'v', s: 'https://i.imgur.com/c7axOnW.mp4' },
+    { t: 'UCSM Orgánico (Copy)', c: 'Contenido Orgánico', d: 'Cato XP con Pecado Capital', k: 'v', a: 'v', s: 'https://i.imgur.com/wXPjQfv.mp4' }
+  ];
+
+  const PIECES = [
+    { t: 'Diseño Horizontal 1', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico', k: 'i', a: 'h', s: 'https://i.imgur.com/4hqLvND.jpeg' },
+    { t: 'Diseño Horizontal 2', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico', k: 'i', a: 'h', s: 'https://i.imgur.com/fAfWdxC.jpeg' },
+    { t: 'Diseño Horizontal 3', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico', k: 'i', a: 'h', s: 'https://i.imgur.com/K1KsFSO.jpeg' },
+    { t: 'Diseño Horizontal 4', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/4hqLvND.jpeg' },
+    { t: 'Diseño Horizontal 5', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/fAfWdxC.jpeg' },
+    { t: 'Diseño Horizontal 6', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/K1KsFSO.jpeg' },
+    { t: 'Diseño Horizontal 7', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/4hqLvND.jpeg' },
+    { t: 'Diseño Horizontal 8', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/fAfWdxC.jpeg' },
+    { t: 'Diseño Horizontal 9', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/K1KsFSO.jpeg' },
+    { t: 'Diseño Horizontal 10', c: 'Diseño Gráfico', d: 'Proyecto de diseño gráfico (Copy)', k: 'i', a: 'h', s: 'https://i.imgur.com/4hqLvND.jpeg' }
+  ];
+
+  // Enlaces rápidos en el Hero (primeros 4 videos)
+  VIDEOS.slice(0, 4).forEach((p, i) => {
+    const li = document.createElement('li');
+    li.innerHTML = `<a data-vcard="${i}">${pad(i)} ${p.t} ↗</a>`;
+    $('#hlist').appendChild(li);
+  });
+
+  // Constructor reutilizable de Carruseles 3D con ScrollTrigger
+  function createCarousel({ items, sectionSel, stageSel, ghostSel, txtSel, catSel, titleSel, descSel, idxSel, prevSel, nextSel, scrollMult }) {
+    const count = items.length;
+    const state = { cur: 0, idx: -1 };
+    const stage = $(stageSel);
+    let stInstance = null;
+
+    items.forEach((p, i) => {
+      const el = document.createElement('div');
+      el.className = 'card ' + p.a;
+      const media = p.k === 'v'
+        ? `<video muted loop playsinline preload="metadata" src="${p.s}#t=0.5"></video>`
+        : `<img loading="lazy" src="${p.s}" alt="${p.t}">`;
+      el.innerHTML = `<div class="cin">${media}</div><span class="cn mono">${pad(i)}</span>`;
+      el.addEventListener('click', () => Math.abs(i - state.cur) < 0.5 ? openModal(p) : goTo(i));
+      stage.appendChild(el);
+    });
+
+    const cards = [...stage.querySelectorAll('.card')];
+
+    function setActive(i, force) {
+      if (i === state.idx && !force) return;
+      state.idx = i;
+      const p = items[i];
+      cards.forEach((c, j) => {
+        const v = c.querySelector('video');
+        if (!v) return;
+        if (j === i) v.play().catch(() => {});
+        else v.pause();
+      });
+      $(catSel).textContent = p.c;
+      $(titleSel).textContent = p.t;
+      $(descSel).textContent = p.d;
+      $(idxSel).textContent = `${pad(i)} / ${pad(count - 1)}`;
+      gsap.fromTo(txtSel, { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.45 });
+    }
+
+    function render() {
+      const W = innerWidth, m = W < 768, step = W * (m ? 0.62 : 0.36);
+      cards.forEach((el, i) => {
+        const off = i - state.cur, a = Math.abs(off);
+        const z = -Math.min(a, 3) * (m ? 150 : 280);
+        const ry = -Math.max(-1.4, Math.min(1.4, off)) * (m ? 26 : 36);
+        const sc = 1 - Math.min(a, 2) * 0.06;
+        const op = Math.max(0, 1 - Math.max(0, a - 1.3) / 0.9);
+        el.style.transform = `translate3d(calc(-50% + ${off * step}px),-50%,${z}px) rotateY(${ry}deg) scale(${sc})`;
+        el.style.opacity = op;
+        el.style.filter = `brightness(${1 - Math.min(a, 1) * 0.55})`;
+        el.style.pointerEvents = op > 0.1 ? 'auto' : 'none';
+        
+        // Z-Index Update to fix the overlap issue
+        el.style.zIndex = Math.round(100 - (a * 10));
+      });
+      const activeIdx = Math.round(state.cur);
+      if (activeIdx !== state.idx) setActive(activeIdx);
+    }
+
+    function goTo(i) {
+      i = Math.max(0, Math.min(count - 1, i));
+      if (!stInstance) return;
+      const targetY = stInstance.start + (i / (count - 1)) * (stInstance.end - stInstance.start);
+      scrollTo({ top: targetY, behavior: 'smooth' });
+    }
+
+    $(prevSel).onclick = () => goTo(state.idx - 1);
+    $(nextSel).onclick = () => goTo(state.idx + 1);
+
+    stInstance = gsap.to(state, {
+      cur: count - 1,
+      ease: 'none',
+      onUpdate: render,
+      scrollTrigger: {
+        trigger: sectionSel,
+        start: 'top top',
+        end: () => '+=' + innerHeight * count * scrollMult,
+        pin: true,
+        scrub: 0.7,
+        invalidateOnRefresh: true
+      }
+    }).scrollTrigger;
+
+    gsap.fromTo(ghostSel, { xPercent: 6 }, {
+      xPercent: -38,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: sectionSel,
+        start: 'top top',
+        end: () => '+=' + innerHeight * count * scrollMult,
+        scrub: true
+      }
+    });
+
+    render();
+    return {
+      goTo,
+      getStart: () => stInstance ? stInstance.start : 0,
+      refreshActive: () => setActive(state.idx, true),
+      pauseAll: () => cards.forEach(c => { const v = c.querySelector('video'); if (v) v.pause(); })
+    };
+  }
+
+  const videoCarousel = createCarousel({
+    items: VIDEOS,
+    sectionSel: '#videos',
+    stageSel: '#v-stage',
+    ghostSel: '#v-ghost',
+    txtSel: '#v-txt',
+    catSel: '#v-cat',
+    titleSel: '#v-title',
+    descSel: '#v-desc',
+    idxSel: '#v-idx',
+    prevSel: '#v-prev',
+    nextSel: '#v-next',
+    scrollMult: 0.6
+  });
+
+  const piecesCarousel = createCarousel({
+    items: PIECES,
+    sectionSel: '#pieces',
+    stageSel: '#p-stage',
+    ghostSel: '#p-ghost',
+    txtSel: '#p-txt',
+    catSel: '#p-cat',
+    titleSel: '#p-title',
+    descSel: '#p-desc',
+    idxSel: '#p-idx',
+    prevSel: '#p-prev',
+    nextSel: '#p-next',
+    scrollMult: 0.75
+  });
+
+  addEventListener('resize', () => {
+    ScrollTrigger.refresh();
+  });
+
+  /* ---------- Modal con revelación triangular ---------- */
+  function openModal(p) {
+    $('#mcat').textContent = p.c;
+    $('#mtitle').textContent = p.t;
+    $('#mdesc').textContent = p.d;
+    $('#mmedia').innerHTML = p.k === 'v'
+      ? `<video src="${p.s}" controls autoplay playsinline></video>`
+      : `<img src="${p.s}" alt="${p.t}">`;
+    videoCarousel.pauseAll();
+    $('#modal').style.display = 'flex';
+    document.documentElement.style.overflow = 'hidden';
+    gsap.fromTo('#modal', { opacity: 0 }, { opacity: 1, duration: 0.4 });
+    gsap.fromTo('#mbox',
+      { clipPath: 'polygon(50% 40%,60% 60%,40% 60%)' },
+      { clipPath: 'polygon(50% -150%,250% 250%,-150% 250%)', duration: 1, ease: 'power3.inOut', onComplete: () => { $('#mbox').style.clipPath = 'none'; } }
+    );
+  }
+
+  function closeModal() {
+    gsap.to('#modal', {
+      opacity: 0,
+      duration: 0.3,
+      onComplete: () => {
+        $('#modal').style.display = 'none';
+        $('#mmedia').innerHTML = '';
+        document.documentElement.style.overflow = '';
+        videoCarousel.refreshActive();
+      }
+    });
+  }
+
+  $('#mclose').onclick = closeModal;
+  addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('#modal').style.display === 'flex') closeModal();
+  });
+
+  /* ---------- División de texto ---------- */
+  function split(el) {
+    const t = el.textContent;
+    el.innerHTML = '';
+    [...t].forEach(ch => {
+      const m = document.createElement('span');
+      m.className = 'mk';
+      const i = document.createElement('i');
+      i.textContent = ch;
+      m.appendChild(i);
+      el.appendChild(m);
+    });
+    return el.querySelectorAll('i');
+  }
+  const wmI = split($('#wm')), chI = split($('#ch'));
+  $('#vh').innerHTML = $('#vh').textContent.split(' ').map(w => `<span class="w">${w}</span>`).join(' ');
+
+  /* ---------- Three.js: Triángulo holográfico ---------- */
+  const sink = { y: 0, a: 1 };
+  let light = false;
+  const cur = { x: 0, y: 0, s: 1.9, a: 1 }, tg = { x: 0, y: 0, s: 1.9, a: 1 };
+
+  if (typeof THREE !== 'undefined') {
+    const R = new THREE.WebGLRenderer({ canvas: $('#gl'), alpha: true, antialias: true });
+    R.setPixelRatio(Math.min(devicePixelRatio, 2));
+    const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    cam.position.z = 8;
+
+    function size() {
+      R.setSize(innerWidth, innerHeight, false);
+      cam.aspect = innerWidth / innerHeight;
+      cam.updateProjectionMatrix();
+    }
+    size();
+    addEventListener('resize', size);
+
+    const RR = 1.6, sh = new THREE.Shape();
+    sh.moveTo(0, RR);
+    sh.lineTo(-RR * 0.866, -RR * 0.5);
+    sh.lineTo(RR * 0.866, -RR * 0.5);
+    sh.closePath();
+
+    const r2 = RR * 0.5, hole = new THREE.Path();
+    hole.moveTo(0, r2);
+    hole.lineTo(r2 * 0.866, -r2 * 0.5);
+    hole.lineTo(-r2 * 0.866, -r2 * 0.5);
+    hole.closePath();
+    sh.holes.push(hole);
+
+    const geo = new THREE.ExtrudeGeometry(sh, { depth: 0.5, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.06, bevelSegments: 3 });
+    geo.center();
+
+    const mat = new THREE.ShaderMaterial({
+      transparent: true,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      uniforms: { t: { value: 0 }, a: { value: 1 } },
+      vertexShader: 'varying vec3 vN;varying vec3 vV;varying vec3 vP;void main(){vec4 mv=modelViewMatrix*vec4(position,1.);vN=normalize(normalMatrix*normal);vV=normalize(-mv.xyz);vP=position;gl_Position=projectionMatrix*mv;}',
+      fragmentShader: 'uniform float t;uniform float a;varying vec3 vN;varying vec3 vV;varying vec3 vP;void main(){float f=pow(1.-abs(dot(normalize(vN),normalize(vV))),2.);float k=.5+.5*sin(vP.x*1.5+vP.y*2.+t+f*4.);vec3 g=vec3(.063,.725,.506);vec3 c=vec3(.024,.714,.831);vec3 b=vec3(.055,.647,.914);vec3 col=mix(mix(g,c,k),b,.5+.5*sin(t*.6+vP.y*2.));col=col*(.35+f*1.2)+vec3(.8,1.,.95)*pow(f,3.)*.8;gl_FragColor=vec4(col,a*(.55+.45*f));}'
+    });
+
+    const tri = new THREE.Group(), mesh = new THREE.Mesh(geo, mat);
+    const lines = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 30), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 }));
+    const wire = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 2.7, 0), new THREE.Vector3(-2.34, -1.35, 0), new THREE.Vector3(2.34, -1.35, 0)]), new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.3 }));
+    tri.add(mesh, lines, wire);
+    scene.add(tri);
+
+    let mx = 0, my = 0, tx = 0, ty = 0;
+    const cD = new THREE.Color(0xffffff), cL = new THREE.Color(0x0f172a), clock = new THREE.Clock();
+
+    addEventListener('pointermove', e => {
+      mx = e.clientX / innerWidth * 2 - 1;
+      my = e.clientY / innerHeight * 2 - 1;
+      $('#xy').textContent = `X ${(e.clientX / innerWidth).toFixed(3)} · Y ${(e.clientY / innerHeight).toFixed(3)}`;
+    });
+
+    (function loop() {
+      const t = clock.getElapsedTime(), mob = innerWidth < 768, asp = Math.min(1, innerWidth / innerHeight / 1.78);
+      for (const k in cur) cur[k] += (tg[k] - cur[k]) * 0.06;
+      tri.position.set(mob ? 0 : cur.x * asp, cur.y + sink.y, 0);
+      tri.scale.setScalar(cur.s * (mob ? 0.62 : 1));
+      tx += (mx - tx) * 0.05;
+      ty += (my - ty) * 0.05;
+      tri.rotation.y = t * 0.35 + scrollY * 0.0025 + tx * 0.6;
+      tri.rotation.x = ty * 0.35 + Math.sin(t * 0.5) * 0.1;
+      tri.rotation.z = scrollY * 0.0006;
+      wire.rotation.z = -t * 0.2;
+      const A = cur.a * sink.a * (mob ? 0.6 : 1);
+      mat.uniforms.t.value = t;
+      mat.uniforms.a.value = A;
+      lines.material.opacity = 0.85 * A;
+      wire.material.opacity = 0.3 * A;
+      lines.material.color.lerp(light ? cL : cD, 0.1);
+      wire.material.color.lerp(light ? cL : cD, 0.1);
+      R.render(scene, cam);
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* ---------- Scroll y transiciones de sección ---------- */
+  const secs = $$('[data-tri]');
+  let curSec = null;
+
+  function onScroll() {
+    const mid = innerHeight * 0.5;
+    let f = secs[0];
+    secs.forEach(s => {
+      const r = s.getBoundingClientRect();
+      if (r.top <= mid && r.bottom > mid) f = s;
+    });
+    if (f !== curSec) {
+      curSec = f;
+      const [x, y, s, a] = f.dataset.tri.split(',').map(Number);
+      Object.assign(tg, { x, y, s, a });
+      light = f.dataset.light === '1';
+      document.body.classList.toggle('light', light);
+      $('#sn').textContent = `${pad(secs.indexOf(f))} / ${pad(secs.length - 1)}`;
+      $('#sname').textContent = f.dataset.name;
+      $$('#hdr nav a').forEach(a => a.classList.toggle('on', a.dataset.go === f.id));
+    }
+    const max = document.documentElement.scrollHeight - innerHeight;
+    $('#rp').style.strokeDashoffset = 88 - 88 * Math.min(1, scrollY / Math.max(1, max));
+  }
+  addEventListener('scroll', onScroll, { passive: true });
+
+  // Transición fondo blanco en Visión
+  gsap.fromTo('#vbg', { clipPath: 'polygon(50% 0%,56% 9%,44% 9%)' }, {
+    clipPath: 'polygon(50% -150%,250% 250%,-150% 250%)',
+    ease: 'none',
+    scrollTrigger: { trigger: '#vision', start: 'top 95%', end: 'top 25%', scrub: true }
+  });
+
+  // Descenso del triángulo 3D detrás del fondo negro al salir de Visión
+  gsap.fromTo(sink, { y: 0, a: 1 }, {
+    y: -6.2,
+    a: 0,
+    ease: 'none',
+    scrollTrigger: { trigger: '#vision', start: 'bottom 85%', end: 'bottom 15%', scrub: true }
+  });
+
+  gsap.to('.vin .w', {
+    opacity: 1,
+    stagger: 0.08,
+    ease: 'none',
+    scrollTrigger: { trigger: '#vision', start: 'top 45%', end: 'center 35%', scrub: true }
+  });
+
+  gsap.fromTo('#tri', { clipPath: 'polygon(50% 100%,50% 100%,50% 100%)', scale: 1.3 }, {
+    clipPath: 'polygon(50% 0,100% 100%,0 100%)',
+    scale: 1,
+    duration: 1.2,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: '#tri', start: 'top 85%' }
+  });
+
+  gsap.from('.row', {
+    y: 60,
+    opacity: 0,
+    stagger: 0.12,
+    duration: 0.9,
+    ease: 'power3.out',
+    scrollTrigger: { trigger: '#services', start: 'top 60%' }
+  });
+
+  gsap.fromTo(chI, { yPercent: 110 }, {
+    yPercent: 0,
+    stagger: 0.05,
+    duration: 1,
+    ease: 'power4.out',
+    scrollTrigger: { trigger: '#contact', start: 'top 60%' }
+  });
+
+  /* ---------- Navegación ---------- */
+  function go(id) {
+    let y = 0;
+    if (id === 'videos') y = videoCarousel.getStart();
+    else if (id === 'pieces') y = piecesCarousel.getStart();
+    else if (id !== 'hero') y = $('#' + id).getBoundingClientRect().top + scrollY;
+    scrollTo({ top: y, behavior: 'smooth' });
+  }
+
+  document.addEventListener('click', e => {
+    const g = e.target.closest('[data-go]');
+    if (g) { e.preventDefault(); go(g.dataset.go); }
+    const c = e.target.closest('[data-vcard]');
+    if (c) { e.preventDefault(); videoCarousel.goTo(+c.dataset.vcard); }
+  });
+
+  /* ---------- Cursor ---------- */
+  if (matchMedia('(pointer:fine)').matches) {
+    const c = $('#cur'), qx = gsap.quickTo(c, 'x', { duration: 0.25 }), qy = gsap.quickTo(c, 'y', { duration: 0.25 });
+    addEventListener('pointermove', e => { qx(e.clientX); qy(e.clientY); });
+    document.addEventListener('pointerover', e => c.classList.toggle('h', !!e.target.closest('a,button,.card,.row')));
+  }
+
+  /* ---------- Secuencia de inicio ---------- */
+  onScroll();
+  const L = { v: 0 };
+  gsap.timeline({ delay: 0.15 })
+    .to(L, {
+      v: 100,
+      duration: 1.4,
+      ease: 'power2.inOut',
+      onUpdate: () => { $('#pct').textContent = String(Math.round(L.v)).padStart(3, '0'); }
+    })
+    .to('#loader', { clipPath: 'polygon(0 0,100% 0,100% 0,0 0)', duration: 0.85, ease: 'power4.inOut' }, '+=0.1')
+    .set('#loader', { display: 'none', onComplete: () => { appStarted = true; } })
+    .fromTo(wmI, { yPercent: 110 }, { yPercent: 0, stagger: 0.09, duration: 1.1, ease: 'power4.out', immediateRender: true }, '-=0.3')
+    .from('.hf', { opacity: 0, y: 20, stagger: 0.1, duration: 0.8, ease: 'power3.out' }, '-=0.7')
+    .from('#hdr', { opacity: 0, y: -30, duration: 0.8, ease: 'power3.out' }, '-=0.8');
+
+  addEventListener('load', () => ScrollTrigger.refresh());
+});
+</script>
+</body>
+</html>
