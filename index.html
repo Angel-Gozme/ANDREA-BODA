@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANGEL GOZME Portafolio</title>
+<title>ANGEL GOZME — Portafolio</title>
 <link rel="icon" type="image/png" href="https://i.imgur.com/9eSvFcN.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@500;700&family=Space+Mono&display=swap" rel="stylesheet">
 <style>
@@ -225,10 +225,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
       <div class="mono" style="margin-bottom:4vh">03 — Visión</div>
       <h2 id="vh">Diseño y movimiento que conectan marcas con su audiencia.</h2>
       <p>Soy Angel Gozme, diseñador gráfico digital y editor de video. Creo piezas para marcas, instituciones y proyectos culturales, donde cada detalle visual tiene un propósito.</p>
-      <div class="vrow">
-        <img class="tri-img" id="tri" src="https://i.imgur.com/9eSvFcN.png" alt="Angel Gozme">
-        <div class="mono">Video Editor<br>Designer<br>Motion</div>
-      </div>
     </div>
   </section>
 
@@ -623,14 +619,6 @@ window.addEventListener('DOMContentLoaded', () => {
     stagger: 0.08,
     ease: 'none',
     scrollTrigger: { trigger: '#vision', start: 'top 45%', end: 'center 35%', scrub: true }
-  });
-
-  gsap.fromTo('#tri', { clipPath: 'polygon(50% 100%,50% 100%,50% 100%)', scale: 1.3 }, {
-    clipPath: 'polygon(50% 0,100% 100%,0 100%)',
-    scale: 1,
-    duration: 1.2,
-    ease: 'power3.out',
-    scrollTrigger: { trigger: '#tri', start: 'top 85%' }
   });
 
   gsap.from('.row', {
